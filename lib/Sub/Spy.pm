@@ -138,7 +138,7 @@ __END__
 
 =head1 NAME
 
-Sub::Spy - Sub::Spy is subref wrapper that records arguments, return value, and exception threw.
+Sub::Spy - Sub::Spy is subref wrapper that records arguments, return value, and exception thrown.
 
 =head1 VERSION
 
