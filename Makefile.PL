@@ -25,6 +25,8 @@ use inc::Module::Install;
 
 all_from 'lib/Sub/Spy.pm';
 
+requires 'List::MoreUtils';
+requires 'Class::Accessor::Fast';
 
 test_requires 'Test::More'     => '0.88';
 test_requires 'Test::Requires' => '0.06';

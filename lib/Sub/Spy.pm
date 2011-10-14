@@ -6,7 +6,6 @@ use warnings;
 our $VERSION = '0.01';
 
 use List::MoreUtils qw/any/;
-use Data::Dump qw/dump/;
 
 use Sub::Spy::Call;
 
