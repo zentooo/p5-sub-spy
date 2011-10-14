@@ -30,7 +30,7 @@ sub get_call {
     $self->{calls}->[$n];
 }
 
-use overload "&{}" => sub {
+use overload '&{}' => sub {
     my $self = shift;
 
     return sub {

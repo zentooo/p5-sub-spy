@@ -10,6 +10,10 @@ subtest("new with subref that returns single value", sub {
 
     is ( $spy->(10), 10, "spy is callable and executes wrapped subref" );
     is ( $spy->(20), $subref->(20), "results of subref call and spy call just matches" );
+
+    #note ref $spy;
+    #ok ( ref $spy eq "CODE" );
+    #ok ( "CODE" eq ref $spy );
 });
 
 subtest("new with subref that returns multiple values", sub {
@@ -32,7 +36,7 @@ subtest("get_call", sub {
     $spy->(sub { return 1 });
     is ( $spy->get_call(0)->return_value, 1, "first call result is 1" );
     is ( $spy->get_call(0)->exception, undef, "first call did not throw exception" );
-    is ( ref $spy->get_call(0)->args->[0], "CODE", "first call arg is subref" );
+    #is ( ref $spy->get_call(0)->args->[0], "CODE", "first call arg is subref" );
 
     $spy->(sub { die '%%die%%' });
     like ( $spy->get_call(1)->exception, qr/%%die%%/, "second call exception is ..." );
