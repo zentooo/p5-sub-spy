@@ -66,7 +66,23 @@ This document describes Sub::Spy version 0.01.
 
 =head1 SYNOPSIS
 
-    use Sub::Spy;
+    use Sub::Spy qw/spy inspect/;
+
+    my $subref = sub { return $_[0] * $_[1]; };
+    my $spy = spy($subref);
+
+    $spy->(2, 5);
+
+    inspect($spy)->get_call(0)->args; # [2, 5]
+    inspect($spy)->get_call(0)->return_value; # 10
+
+    $spy->(3, 3);
+
+    inspect($spy)->args; # [[2, 5], [3, 3]]
+    inspect($spy)->return_values; # [10, 9]
+
+    inspect($spy)->get_args(1); # [3, 3]
+    inspect($spy)->get_return_value(1); # 9
 
 =head1 DESCRIPTION
 
