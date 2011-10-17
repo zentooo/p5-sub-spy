@@ -5,48 +5,36 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use List::MoreUtils qw/any/;
+use parent qw/Exporter/;
+our @EXPORT_OK = qw/spy inspect/;
 
+use Sub::Spy::Result;
 use Sub::Spy::Call;
 
 
-sub new {
-    my ($class, $subref) = @_;
+my $store = +{};
 
-    return bless +{
-        subref => $subref,
-        calls => [],
-    }, $class;
-}
 
-sub subref {
-    my $self = shift;
-    return $self->{subref};
-}
+sub spy {
+    my $subref = shift;
 
-sub get_call {
-    my ($self, $n) = @_;
-    $self->{calls}->[$n];
-}
+    my $spy;
 
-use overload '&{}' => sub {
-    my $self = shift;
-
-    return sub {
+    $spy = sub {
         my @args = @_;
         my ($result, @array_result, $e);
 
         if ( wantarray ) {
-            @array_result = eval { $self->subref->(@args); };
+            @array_result = eval { $subref->(@args); };
         }
         else {
-            $result = eval { $self->subref->(@args); };
+            $result = eval { $subref->(@args); };
         }
         if ( $@ ) {
             $e = $@;
         }
 
-        push @{$self->{calls}}, Sub::Spy::Call->new({
+        push @{$store->{$spy + 0}->{calls}}, Sub::Spy::Call->new({
             args => \@args,
             exception => $e,
             return_value => wantarray ? \@array_result : $result,
@@ -54,81 +42,14 @@ use overload '&{}' => sub {
 
         return wantarray ? @array_result : $result;
     };
-};
 
-
-# count
-
-sub call_count {
-    return scalar @{shift->{calls}};
+    return $spy;
 }
 
-sub called {
-    return (shift->call_count > 0) ? 1 : 0;
-}
-
-sub called_times {
-    my ($self, $times) = @_;
-    return ($self->call_count == $times) ? 1 : 0;
-}
-
-sub called_once {
-    return shift->called_times(1);
-}
-
-sub called_twice {
-    return shift->called_times(2);
-}
-
-sub called_thrice {
-    return shift->called_times(3);
-}
-
-
-# args
-
-sub args {
-    my $self = shift;
-    return [map { $_->args } @{$self->{calls}}];
-}
-
-sub get_args {
-    my ($self, $n) = @_;
-    die "try to get arguments of not-yet-called call." if $n >= scalar @{$self->{calls}};
-    return $self->args->[$n];
-}
-
-
-# exception
-
-sub exceptions {
-    my $self = shift;
-    return [map { $_->exception } @{$self->{calls}}];
-}
-
-sub get_exception {
-    my ($self, $n) = @_;
-    die "try to get exception of not-yet-called call." if $n >= scalar @{$self->{calls}};
-    return $self->exceptions->[$n];
-}
-
-sub threw {
-    my $self = shift;
-    return ( any { defined($_) } @{$self->exceptions} ) ? 1 : 0;
-}
-
-
-# return
-
-sub return_values {
-    my $self = shift;
-    return [map { $_->return_value } @{$self->{calls}}];
-}
-
-sub get_return_value {
-    my ($self, $n) = @_;
-    die "try to get return value of not-yet-called call." if $n >= scalar @{$self->{calls}};
-    return $self->return_values->[$n];
+sub inspect {
+    my $spy = shift;
+    my $param = $store->{$spy + 0} or die "given subroutine reference is not a spy!";
+    return Sub::Spy::Result->new($param);
 }
 
 
