@@ -72,29 +72,127 @@ This document describes Sub::Spy version 0.01.
     my $spy = spy($subref);
 
     $spy->(2, 5);
+    my $i = inspect($spy);
 
-    inspect($spy)->get_call(0)->args; # [2, 5]
-    inspect($spy)->get_call(0)->return_value; # 10
+    $i->called; # 1 (true)
+    $i->called_once; # 1 (true)
+
+    $i->args; # [[2, 5]]
+    $i->return_values; # [10]
+
+    $i->get_args(0); # [2, 5]
+    $i->get_return_value(0); # 10
+
 
     $spy->(3, 3);
 
-    inspect($spy)->args; # [[2, 5], [3, 3]]
-    inspect($spy)->return_values; # [10, 9]
+    $i->called_twice; # 1 (true)
 
-    inspect($spy)->get_args(1); # [3, 3]
-    inspect($spy)->get_return_value(1); # 9
+    $i->get_call(0)->args; # [2, 5]
+    $i->get_call(0)->return_value; # 10
+
+    $i->get_call(1)->args; # [3, 3]
+    $i->get_call(1)->return_value; # 9
 
 =head1 DESCRIPTION
 
-# TODO
+Sub:Spy provies the way to inspect each subref calls.
+It might be useful for testing callback-style interface or asyncronous subref call. (e.g. AnyEvent)
 
-=head1 INTERFACE
+=head1 FUNCTIONS
 
-=head2 Functions
+=head2 C<spy($subref)>
 
-=head3 C<< hello() >>
+returns wrapped subref as 'spy'
 
-# TODO
+=head2 C<inspect($spy)>
+
+inspect the 'spy' subref and returns Sub::Spy::Result instance
+
+
+=head1 INTERFACE of Sub::Spy::Result
+
+=head2 C<get_call(i)>
+
+returns Sub::Spy::Call instance which represents (i+1)th call
+
+
+=head2 C<call_count>
+
+returns how many times subref called
+
+=head2 C<called>
+
+returns 1 if subref called at least once
+
+=head2 C<called_once>
+
+returns 1 if subref called just once
+
+=head2 C<called_twice>
+
+returns 1 if subref called just twice
+
+=head2 C<called_thrice>
+
+returns 1 if subref called just thrice
+
+=head2 C<called_times(n)>
+
+returns 1 if subref called just n times
+
+
+=head2 C<args>
+
+returns arguments that passed to subref
+
+=head2 C<get_args(i)>
+
+returns arguments that passed to subref at (i+1)th call
+
+
+=head2 C<exceptions>
+
+returns exceptions that raised in subref
+
+=head2 C<get_exception(i)>
+
+returns exceptions that raised in subref at (i+1)th call
+
+=head2 C<threw>
+
+returns 1 if exception raised in subref at least once
+
+
+=head2 C<return_values>
+
+returns return values that subref yield
+
+=head2 C<get_return_value(i)>
+
+returns return value that subref yield at (i+1)th call
+
+
+
+=head1 INTERFACE of Sub::Spy::Call
+
+=head2 C<args>
+
+returns arguments at that call
+
+=head2 C<exception>
+
+returns exception raised at that call
+
+=head2 C<threw>
+
+returns 1 if exception raised at that call
+
+=head2 C<return_value>
+
+returns return value yielded at that call
+
+
 
 =head1 DEPENDENCIES
 

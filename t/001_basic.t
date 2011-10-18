@@ -40,6 +40,10 @@ subtest("inspect", sub {
     is ( inspect($spy1)->get_call(0)->return_value, 1 );
     is ( inspect($spy2)->get_call(0)->return_value, 2 );
 
+    my $res = inspect($spy1);
+    $spy1->(1);
+    is ( $res->get_call(1)->return_value, 1 );
+
     dies_ok(sub {
         inspect(sub {});
     }, "dies if passwd not-spy-subref");
