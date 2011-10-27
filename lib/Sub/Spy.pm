@@ -1,19 +1,20 @@
 package Sub::Spy;
-use 5.008_001;
+use 5.12.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/spy inspect/;
+
+use Hash::FieldHash qw/fieldhash/;
 
 use Sub::Spy::Result;
 use Sub::Spy::Call;
 
 
-my $store = +{};
-
+fieldhash our %store;
 
 sub spy {
     my $subref = shift;
@@ -34,7 +35,7 @@ sub spy {
             $e = $@;
         }
 
-        push @{$store->{$spy + 0}->{calls}}, Sub::Spy::Call->new({
+        push @{$store{$spy}->{calls}}, Sub::Spy::Call->new({
             args => \@args,
             exception => $e,
             return_value => wantarray ? \@array_result : $result,
@@ -48,7 +49,7 @@ sub spy {
 
 sub inspect {
     my $spy = shift;
-    my $param = $store->{$spy + 0} or die "given subroutine reference is not a spy!";
+    my $param = $store{$spy} or die "given subroutine reference is not a spy!";
     return Sub::Spy::Result->new($param);
 }
 
