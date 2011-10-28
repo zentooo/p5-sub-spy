@@ -14,14 +14,14 @@ use Sub::Spy::Result;
 use Sub::Spy::Call;
 
 
-fieldhash our %store;
+fieldhash our %f_store;
 
 sub spy {
     my $subref = shift;
 
-    my $spy;
+    my $store = +{};
 
-    $spy = sub {
+    my $spy = sub {
         my @args = @_;
         my ($result, @array_result, $e);
 
@@ -35,7 +35,7 @@ sub spy {
             $e = $@;
         }
 
-        push @{$store{$spy}->{calls}}, Sub::Spy::Call->new({
+        push @{$store->{calls}}, Sub::Spy::Call->new({
             args => \@args,
             exception => $e,
             return_value => wantarray ? \@array_result : $result,
@@ -44,12 +44,14 @@ sub spy {
         return wantarray ? @array_result : $result;
     };
 
+    $f_store{$spy} = $store;
+
     return $spy;
 }
 
 sub inspect {
     my $spy = shift;
-    my $param = $store{$spy} or die "given subroutine reference is not a spy!";
+    my $param = $f_store{$spy} or die "given subroutine reference is not a spy!";
     return Sub::Spy::Result->new($param);
 }
 
